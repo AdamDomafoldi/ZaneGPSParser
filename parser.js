@@ -21,19 +21,16 @@ device is not in motion
 211: a message containing the last the step
 counts in the last 15 minutes */
 
-function ZaneGPSPayloadDecoder (port, msg, d) {
-	if (port != 204 || msg.length < 4) {
-		return false;
-	}		
-	
+function longPayloadDecoder (msg, d) {	
 	var out = {};
 	var lat = ((d[0] << 16) | (d[1] << 8) | (d[2]));
 	var lon = ((d[3] << 16) | (d[4] << 8) | (d[5]));
 	
 	out['alt'] = ((d[6] << 8) | (d[7]));
-	out['bat'] = d[8] / 255;
+    out['bat'] = d[8] / 255;
+    out['temp'] = ((d[9] << 8) | (d[10])); 
 	
-	if (lat == 0 || lon == 0) {
+	if (lat == 0 || lon == 0) {Ł
 		return false;
 	}
 		
@@ -59,18 +56,38 @@ function ZaneGPSPayloadDecoder (port, msg, d) {
 	return msg;
 };
 
+function shortPayloadDecoder (msg, d) {
+	var out = {};	
+	
+    out['bat'] = d[1] / 255;
+    out['temp'] = ((d[2] << 8) | (d[3])); 
+		
+    msg = out;
+    
+	return msg;
+};
 
-function ZaneGPSParser(msg) {
+/* Representing the hex string as integers */
+function hexStringToIntegers(msg, port) {
 	var data = msg;
 	var hex = msg.match(/.{2}/g);
 	var v = [];
 	for (var i = 0; i < hex.length;i++) {
 		v.push(parseInt('0x' + hex[i]));
-	}
-	
-	return ZaneGPSPayloadDecoder(204, msg, v);
+    }
+    
+    if (msg.length <= 6) {
+        return shortPayloadDecoder(msg, v);
+    }
+    else if(msg.length > 6){
+        return longPayloadDecoder(msg, v);
+    }	
+
+	return false;
 }
 
-var hexPayload = "437d110d6a8400f6029591";
- 
-var payLoad = ZaneGPSParser(hexPayload);
+var hexLongPayload = "437d3a0d6a7c007a027284"; 
+var hexShortPayload = "021785";
+var payload = hexStringToIntegers(hexLongPayload);
+
+console.log(payload);
