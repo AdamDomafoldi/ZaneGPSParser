@@ -31,7 +31,6 @@ function longPayloadDecoder(msg, d) {
 	out['temp'] = ((d[9] << 8) | (d[10]));
 
 	if (lat == 0 || lon == 0) {
-		Ł
 		return false;
 	}
 
