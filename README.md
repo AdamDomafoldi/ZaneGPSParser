@@ -1,2 +1,4 @@
 # ZaneGPSParser
-Parse the hex payload to javascript object
+Parse the hex payload to a javascript object
+
+
