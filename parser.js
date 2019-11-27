@@ -21,28 +21,29 @@ device is not in motion
 211: a message containing the last the step
 counts in the last 15 minutes */
 
-function longPayloadDecoder (msg, d) {	
+function longPayloadDecoder(msg, d) {
 	var out = {};
 	var lat = ((d[0] << 16) | (d[1] << 8) | (d[2]));
 	var lon = ((d[3] << 16) | (d[4] << 8) | (d[5]));
-	
+
 	out['alt'] = ((d[6] << 8) | (d[7]));
-    out['bat'] = d[8] / 255;
-    out['temp'] = ((d[9] << 8) | (d[10])); 
-	
-	if (lat == 0 || lon == 0) {Ł
+	out['bat'] = d[8] / 255;
+	out['temp'] = ((d[9] << 8) | (d[10]));
+
+	if (lat == 0 || lon == 0) {
+		Ł
 		return false;
 	}
-		
+
 	if ((lat & 1 << 23) != 0) {
-		lat = -(1<<24) + lat;
-	}		
+		lat = -(1 << 24) + lat;
+	}
 
 	lat /= 1 << 23;
 	lat *= 90;
-	
+
 	if ((lon & 1 << 23) != 0) {
-		lon = -(1<<24) + lon;			
+		lon = -(1 << 24) + lon;
 	}
 
 	lon /= 1 << 23;
@@ -50,20 +51,20 @@ function longPayloadDecoder (msg, d) {
 
 	out['lat'] = lat;
 	out['lon'] = lon;
-		
+
 	msg = out;
 
 	return msg;
 };
 
-function shortPayloadDecoder (msg, d) {
-	var out = {};	
-	
-    out['bat'] = d[1] / 255;
-    out['temp'] = ((d[2] << 8) | (d[3])); 
-		
-    msg = out;
-    
+function shortPayloadDecoder(msg, d) {
+	var out = {};
+
+	out['bat'] = d[1] / 255;
+	out['temp'] = ((d[2] << 8) | (d[3]));
+
+	msg = out;
+
 	return msg;
 };
 
@@ -72,21 +73,21 @@ function hexStringToIntegers(msg, port) {
 	var data = msg;
 	var hex = msg.match(/.{2}/g);
 	var v = [];
-	for (var i = 0; i < hex.length;i++) {
+	for (var i = 0; i < hex.length; i++) {
 		v.push(parseInt('0x' + hex[i]));
-    }
-    
-    if (msg.length <= 6) {
-        return shortPayloadDecoder(msg, v);
-    }
-    else if(msg.length > 6){
-        return longPayloadDecoder(msg, v);
-    }	
+	}
+
+	if (msg.length <= 6) {
+		return shortPayloadDecoder(msg, v);
+	}
+	else if (msg.length > 6) {
+		return longPayloadDecoder(msg, v);
+	}
 
 	return false;
 }
 
-var hexLongPayload = "437d3a0d6a7c007a027284"; 
+var hexLongPayload = "437d3a0d6a7c007a027284";
 var hexShortPayload = "021785";
 var payload = hexStringToIntegers(hexLongPayload);
 
