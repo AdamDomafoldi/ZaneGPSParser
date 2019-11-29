@@ -10,7 +10,6 @@ Meanings of the port numbers:
 actually is not in motion now /it was a small movement only/
 203: the device is in motion, but can’t get any GPS coordinates /typically with indoor
 usage/
-
 204: GPS coordinates, the device is in
 motion /continous movement detected/
 205: the device is in motion, no coordinates
@@ -27,8 +26,10 @@ function longPayloadDecoder(msg, d) {
 	var lon = ((d[3] << 16) | (d[4] << 8) | (d[5]));
 
 	out['alt'] = ((d[6] << 8) | (d[7]));
-	out['bat'] = d[8] / 255;
-	out['temp'] = ((d[9] << 8) | (d[10]));
+
+	out['bat'] = msg.substr(msg.length - 2);
+	out['temp'] = msg.substr(17,3)/10;
+  	out['temp'] = msg.substr(16,1) == 0 ? out['temp'] : out['temp']*-1;
 
 	if (lat == 0 || lon == 0) {
 		return false;
@@ -72,7 +73,7 @@ function hexStringToIntegers(msg, port) {
 	var data = msg;
 	var hex = msg.match(/.{2}/g);
 	var v = [];
-	for (var i = 0; i < hex.length; i++) {
+	for (var i = 0; i < hex.length-5; i++) {
 		v.push(parseInt('0x' + hex[i]));
 	}
 
