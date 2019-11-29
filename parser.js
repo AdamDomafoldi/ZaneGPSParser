@@ -29,7 +29,7 @@ function longPayloadDecoder(msg, d) {
 
 	out['bat'] = msg.substr(msg.length - 2);
 	out['temp'] = msg.substr(17,3)/10;
-  	out['temp'] = msg.substr(16,1) == 0 ? out['temp'] : out['temp']*-1;
+  	out['temp'] = msg.substr(16,1) == 0 ? out['temp'] : out['temp']*-1; //prefix
 
 	if (lat == 0 || lon == 0) {
 		return false;
@@ -60,8 +60,9 @@ function longPayloadDecoder(msg, d) {
 function shortPayloadDecoder(msg, d) {
 	var out = {};
 
-	out['bat'] = d[1] / 255;
-	out['temp'] = ((d[2] << 8) | (d[3]));
+	out['bat'] = msg.substr(msg.length - 2);
+	out['temp'] = msg.substr(17,3)/10;
+  	out['temp'] = msg.substr(16,1) == 0 ? out['temp'] : out['temp']*-1; //prefix
 
 	msg = out;
 
